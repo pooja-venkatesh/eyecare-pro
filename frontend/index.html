@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EyeCare Pro - Eye Health Monitor (ML Powered)</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#6b9b8e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+  <!-- Lottie -->
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Chart.js for data visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- MediaPipe Face Mesh - REAL ML MODEL -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+</head>
+
+<body class="light">
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-content">
+      <div class="logo">
+        <h1 class="title">EyeCare Pro <span class="title-ai">AI</span></h1>
+      </div>
+
+      <nav class="nav-tabs">
+        <button class="nav-tab active" data-tab="dashboard">
+          <i class="fas fa-chart-line"></i> Dashboard
+        </button>
+        <button class="nav-tab" data-tab="monitor">
+          <i class="fas fa-video"></i> Live Monitor
+        </button>
+        <button class="nav-tab" data-tab="stats">
+          <i class="fas fa-trophy"></i> Stats & Badges
+        </button>
+      </nav>
+
+      <div class="top-right">
+        <!-- USER CHIP -->
+        <div class="user-chip" id="userChip">
+          <div class="user-avatar" id="userAvatar">?</div>
+          <span id="userName">Loading...</span>
+        </div>
+        <!-- LOGOUT -->
+        <button class="btn-logout" onclick="apiLogout()" title="Logout">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+        <!-- THEME TOGGLE -->
+        <div class="theme-toggle" id="themeToggle">
+          <i class="fas fa-sun"></i>
+          <div class="toggle-ball"></div>
+          <i class="fas fa-moon"></i>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- NOTIFICATION BANNER -->
+  <div class="notification-banner" id="notificationBanner">
+    <i class="fas fa-bell"></i>
+    <span id="notificationText">Welcome to EyeCare Pro!</span>
+    <button class="close-notif" onclick="closeNotification()">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main>
+
+    <!-- DASHBOARD TAB -->
+    <div class="tab-content active" id="dashboard">
+      <div class="dashboard-grid">
+        
+        <!-- TODAY'S STATS -->
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-icon blue">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-info">
+              <p class="stat-label">Screen Time Today</p>
+              <h2 class="stat-value" id="todayScreenTime">00:00:00</h2>
+              <p class="stat-trend positive" id="screenTrend">
+                <i class="fas fa-arrow-down"></i> 15% less than yesterday
+              </p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon green">
+              <i class="fas fa-brain"></i>
+            </div>
+            <div class="stat-info">
+              <p class="stat-label">Eye Fatigue Level</p>
+              <h2 class="stat-value" id="fatigueScore">Low</h2>
+              <p class="stat-trend positive" id="fatigueTrend">
+                <i class="fas fa-check-circle"></i> Eyes feeling fresh
+              </p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon orange">
+              <i class="fas fa-coffee"></i>
+            </div>
+            <div class="stat-info">
+              <p class="stat-label">Breaks Taken</p>
+              <h2 class="stat-value" id="breaksTaken">0</h2>
+              <p class="stat-trend positive">
+                <i class="fas fa-fire"></i> <span id="breakStreak">0</span> day streak
+              </p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon purple">
+              <i class="fas fa-star"></i>
+            </div>
+            <div class="stat-info">
+              <p class="stat-label">Health Score</p>
+              <h2 class="stat-value" id="healthScore">85</h2>
+              <p class="stat-trend positive">
+                <i class="fas fa-arrow-up"></i> Great job!
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHARTS ROW -->
+        <div class="charts-row">
+          <div class="chart-card">
+            <h3>Screen Time This Week</h3>
+            <canvas id="screenTimeChart"></canvas>
+          </div>
+
+          <div class="chart-card">
+            <h3>Eye Fatigue Trend</h3>
+            <canvas id="fatigueTrendChart"></canvas>
+          </div>
+        </div>
+
+        <!-- QUICK ACTIONS ROW -->
+        <div class="quick-actions">
+          <div class="action-card action-scan">
+            <div class="action-icon">
+              <i class="fas fa-brain"></i>
+            </div>
+            <h3>AI Fatigue Analysis</h3>
+            <p>Check your eye fatigue level with AI monitoring</p>
+            <button class="btn-scan" onclick="goToMonitor()">
+              <i class="fas fa-play"></i> Start AI Monitor
+            </button>
+          </div>
+
+          <div class="action-card action-camera">
+            <div class="action-icon">
+              <i class="fas fa-brain"></i>
+            </div>
+            <h3>AI Live Monitoring</h3>
+            <p>Real-time eye tracking with MediaPipe</p>
+            <button class="btn-secondary" onclick="goToMonitor()">
+              <i class="fas fa-arrow-right"></i> Open AI Monitor
+            </button>
+          </div>
+        </div>
+
+        <!-- BREAK REMINDER -->
+        <div class="reminder-card">
+          <div class="reminder-icon">
+            <lottie-player
+              src="animations/timer.json"
+              class="timer-anim"
+              background="transparent"
+              loop
+              autoplay>
+            </lottie-player>
+          </div>
+          <div class="reminder-content">
+            <h3>20-20-20 Rule Reminder</h3>
+            <p>Every 20 minutes, look at something 20 feet away for 20 seconds</p>
+            <div class="countdown" id="breakCountdown">Next break in: 20:00</div>
+          </div>
+          <button class="btn-primary" onclick="takeBreak()">
+            <i class="fas fa-pause"></i> Take Break Now
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- LIVE MONITOR TAB -->
+    <div class="tab-content" id="monitor">
+      <div class="monitor-container">
+        
+        <div class="monitor-left">
+          <lottie-player
+            src="animations/student-writing.json"
+            class="study-anim"
+            background="transparent"
+            loop
+            autoplay>
+          </lottie-player>
+        </div>
+
+        <div class="monitor-center">
+          
+          <!-- EYE SCAN CARD (MOVED TO TOP) -->
+          <div class="card eye-scan-primary">
+            <h2>
+              Eye Blink Analysis
+            </h2>
+
+            <button class="btn-scan" onclick="startEyeScan()">
+              <i class="fas fa-search"></i> START EYE SCAN
+            </button>
+
+            <div class="blink-result">
+              <div class="blink-indicator" id="blinkIndicator">
+                <div class="indicator-bar"></div>
+              </div>
+            </div>
+
+            <!-- STATUS BAR -->
+            <div class="blink-status-bar" id="blinkStatusBar">
+              <span class="status-rate">Current Rate: <strong id="blinkRate">--</strong> blinks/min</span>
+              <span class="status-divider">—</span>
+              <span class="status-msg" id="blinkDesc">Start AI Monitoring to begin analysis</span>
+            </div>
+
+            <div class="scan-history" id="scanHistory">
+              <h4>Recent Scans</h4>
+              <div id="historyList">No scans yet</div>
+            </div>
+          </div>
+
+          <!-- VIDEO FEED CARD (MOVED BELOW SCAN) -->
+          <div class="card video-card">
+            <h2>
+              <i class="fas fa-brain"></i> AI-Powered Real-Time Monitoring
+              <span style="font-size: 0.6em; background: linear-gradient(135deg, var(--accent-green), var(--accent-blue)); padding: 0.2rem 0.6rem; border-radius: 20px; color: white; margin-left: 0.5rem;">LIVE ML</span>
+            </h2>
+            
+            <div class="camera-info">
+              <i class="fas fa-robot"></i>
+              <p><strong>MediaPipe Face Mesh AI:</strong> Enable your camera for advanced real-time features using Google's ML model with 468 facial landmarks tracking.</p>
+            </div>
+
+            <!-- FEATURE CHECKLIST -->
+            <div class="features-grid">
+              <div class="feature-item">
+                <div class="feature-icon">
+                  <i class="fas fa-ruler"></i>
+                </div>
+                <div class="feature-info">
+                  <strong>Distance Monitor</strong>
+                  <p>Real-time face width calculation</p>
+                </div>
+                <div class="feature-status" id="distanceStatus">
+                  <i class="fas fa-circle-notch"></i> Inactive
+                </div>
+              </div>
+
+              <div class="feature-item">
+                <div class="feature-icon">
+                  <i class="fas fa-user-check"></i>
+                </div>
+                <div class="feature-info">
+                  <strong>Posture Detection</strong>
+                  <p>Head angle & position tracking</p>
+                </div>
+                <div class="feature-status" id="postureStatus">
+                  <i class="fas fa-circle-notch"></i> Inactive
+                </div>
+              </div>
+
+              <div class="feature-item">
+                <div class="feature-icon">
+                  <i class="fas fa-eye-dropper"></i>
+                </div>
+                <div class="feature-info">
+                  <strong>Eye Redness Detection</strong>
+                  <p>Pixel-level color analysis</p>
+                </div>
+                <div class="feature-status" id="rednessStatus">
+                  <i class="fas fa-circle-notch"></i> Inactive
+                </div>
+              </div>
+
+              <div class="feature-item">
+                <div class="feature-icon">
+                  <i class="fas fa-eye"></i>
+                </div>
+                <div class="feature-info">
+                  <strong>Live Blink Tracking</strong>
+                  <p>Eye Aspect Ratio (EAR) algorithm</p>
+                </div>
+                <div class="feature-status" id="liveBlinkStatus">
+                  <i class="fas fa-circle-notch"></i> Inactive
+                </div>
+              </div>
+            </div>
+            
+            <div class="video-container">
+              <video id="videoFeed" autoplay playsinline></video>
+              <canvas id="overlay"></canvas>
+              <div class="video-status" id="videoStatus">
+                <i class="fas fa-circle"></i> AI Model Ready
+              </div>
+              
+              <!-- LIVE STATS OVERLAY -->
+              <div class="live-stats" id="liveStats" style="display: none;">
+                <div class="stat-overlay">
+                  <i class="fas fa-ruler-combined"></i>
+                  <span id="distanceValue">--</span>
+                </div>
+                <div class="stat-overlay">
+                  <i class="fas fa-head-side-virus"></i>
+                  <span id="postureValue">--</span>
+                </div>
+                <div class="stat-overlay">
+                  <i class="fas fa-tired"></i>
+                  <span id="fatigueValue">--</span>
+                </div>
+                <div class="stat-overlay">
+                  <i class="fas fa-thermometer-half"></i>
+                  <span id="rednessValue">--</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="video-controls">
+              <button class="btn-primary" onclick="startAIMonitoring()">
+                <i class="fas fa-robot"></i> Start AI Monitoring
+              </button>
+              <button class="btn-secondary" onclick="stopAIMonitoring()" disabled id="stopAdvancedBtn">
+                <i class="fas fa-stop"></i> Stop AI
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- STATS & BADGES TAB -->
+    <div class="tab-content" id="stats">
+      <div class="stats-container">
+        
+        <div class="achievements-section">
+          <h2>
+            <i class="fas fa-trophy"></i> Achievements & Badges
+          </h2>
+          
+          <div class="badges-grid" id="badgesGrid">
+            <!-- Badges will be generated by JS -->
+          </div>
+        </div>
+
+        <div class="weekly-report">
+          <h2>
+            <i class="fas fa-chart-bar"></i> Weekly Report
+          </h2>
+          
+          <div class="report-stats">
+            <div class="report-item">
+              <i class="fas fa-clock"></i>
+              <div>
+                <p>Total Screen Time</p>
+                <h3 id="weeklyScreenTime">0h 0m</h3>
+              </div>
+            </div>
+            
+            <div class="report-item">
+              <i class="fas fa-eye"></i>
+              <div>
+                <p>Total Eye Scans</p>
+                <h3 id="weeklyScans">0</h3>
+              </div>
+            </div>
+            
+            <div class="report-item">
+              <i class="fas fa-coffee"></i>
+              <div>
+                <p>Breaks Taken</p>
+                <h3 id="weeklyBreaks">0</h3>
+              </div>
+            </div>
+            
+            <div class="report-item">
+              <i class="fas fa-star"></i>
+              <div>
+                <p>Best Day</p>
+                <h3 id="bestDay">Monday</h3>
+              </div>
+            </div>
+          </div>
+
+          <canvas id="weeklyChart"></canvas>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- BREAK MODAL -->
+  <div class="modal" id="breakModal">
+    <div class="modal-content">
+      <div class="modal-icon">
+        <i class="fas fa-spa"></i>
+      </div>
+      <h2>Time for a Break!</h2>
+      <p>Look at something 20 feet away for 20 seconds</p>
+      <div class="break-timer" id="breakTimer">20</div>
+      <button class="btn-primary" onclick="closeBreakModal()">
+        <i class="fas fa-check"></i> Done
+      </button>
+    </div>
+  </div>
+
+  <!-- DROWSINESS ALERT OVERLAY -->
+  <div id="drowsinessAlert" style="
+    display:none; position:fixed; inset:0; z-index:2000;
+    background:rgba(0,0,0,0.90); backdrop-filter:blur(12px);
+    align-items:center; justify-content:center; flex-direction:column;
+    text-align:center; color:white; animation: fadeIn 0.3s ease;">
+    <div style="font-size:4rem; margin-bottom:1rem;">😴</div>
+    <h2 style="font-family:'Syne',sans-serif; font-size:2.2rem; font-weight:800; margin-bottom:0.5rem; color:#0fffd4;">Drowsiness Detected!</h2>
+    <p style="font-size:1rem; color:#9baacf; margin-bottom:2rem; max-width:360px; line-height:1.6;">Your eyes have been closed for too long. Please wake up and take a short break.</p>
+    <button onclick="document.getElementById('drowsinessAlert').style.display='none'" style="
+      padding:0.9rem 2.5rem; background:linear-gradient(135deg,#0fffd4,#a57eff);
+      border:none; border-radius:14px; color:#0A0A0B; font-size:1rem;
+      font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif;
+      box-shadow:0 6px 20px rgba(15,255,212,0.3); transition:all 0.3s ease;">
+      I'm Awake!
+    </button>
+  </div>
+
+  <!-- FLOATING ACTION BUTTON -->
+  <div class="fab-container">
+    <button class="fab" onclick="goToMonitor()" title="AI Monitor">
+      <i class="fas fa-brain"></i>
+    </button>
+    <span class="fab-label">AI Monitor</span>
+  </div>
+
+  <!-- PWA Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+  </script>
+
+  <!-- ML MODULE (Embedded) -->
+  <script src="script-with-ml.js"></script>
+
+  <!-- API INTEGRATION MODULE -->
+  <script src="api.js"></script>
+</body>
+</html>

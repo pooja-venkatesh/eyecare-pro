@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EyeCare Pro – Sign In</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    /* ─── CSS Variables ─── */
+    :root {
+      --bg:          #1a1a2e;
+      --surface:     #16213e;
+      --card:        #0f3460;
+      --accent:      #e94560;
+      --accent2:     #f5a7b8;
+      --text:        #f1f5f9;
+      --muted:       #94a3b8;
+      --border:      rgba(233,69,96,0.25);
+      --glow:        rgba(233,69,96,0.18);
+      --input-bg:    rgba(255,255,255,0.06);
+      --success:     #10b981;
+      --error:       #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ─── Animated background ─── */
+    .bg-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      animation: drift 18s ease-in-out infinite;
+    }
+    .bg-orb:nth-child(1) {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(233,69,96,0.22), transparent 70%);
+      top: -120px; right: -100px;
+      animation-delay: 0s;
+    }
+    .bg-orb:nth-child(2) {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(245,167,184,0.15), transparent 70%);
+      bottom: -80px; left: -80px;
+      animation-delay: -7s;
+    }
+    .bg-orb:nth-child(3) {
+      width: 280px; height: 280px;
+      background: radial-gradient(circle, rgba(16,185,129,0.12), transparent 70%);
+      top: 40%; left: 10%;
+      animation-delay: -13s;
+    }
+
+    @keyframes drift {
+      0%,100% { transform: translate(0,0) scale(1); }
+      33%      { transform: translate(30px,-40px) scale(1.05); }
+      66%      { transform: translate(-20px,30px) scale(0.97); }
+    }
+
+    /* ─── Layout ─── */
+    .page {
+      display: flex;
+      width: 100%;
+      max-width: 960px;
+      min-height: 580px;
+      margin: 2rem;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ─── Left Panel ─── */
+    .left-panel {
+      flex: 1;
+      background: linear-gradient(160deg, #0f3460 0%, #16213e 60%, #1a1a2e 100%);
+      padding: 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-right: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .left-panel::before {
+      content: '';
+      position: absolute;
+      width: 350px; height: 350px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(233,69,96,0.12), transparent 70%);
+      top: -100px; right: -100px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .brand-icon {
+      width: 52px; height: 52px;
+      background: var(--accent);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: white;
+      box-shadow: 0 8px 24px var(--glow);
+    }
+
+    .brand-text {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .brand-text span { color: var(--accent); }
+
+    .tagline {
+      font-size: 2.4rem;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -1px;
+    }
+    .tagline .highlight {
+      color: var(--accent);
+      display: block;
+    }
+
+    .tagline-sub {
+      margin-top: 1rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .feature-pills {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .pill {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(233,69,96,0.15);
+      border-radius: 12px;
+      font-size: 0.9rem;
+      color: var(--muted);
+      transition: all 0.3s;
+    }
+    .pill:hover {
+      background: rgba(233,69,96,0.08);
+      border-color: var(--accent);
+      color: var(--text);
+    }
+    .pill i { color: var(--accent); width: 18px; text-align: center; }
+
+    .stats-row {
+      display: flex;
+      gap: 1rem;
+    }
+    .mini-stat {
+      flex: 1;
+      text-align: center;
+      padding: 0.8rem;
+      background: rgba(233,69,96,0.08);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .mini-stat .num {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .mini-stat .lbl {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.2rem;
+    }
+
+    /* ─── Right Panel (Form) ─── */
+    .right-panel {
+      width: 420px;
+      background: var(--surface);
+      padding: 3rem 2.8rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .form-header {
+      margin-bottom: 2rem;
+    }
+
+    .form-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 0.4rem;
+    }
+
+    .form-subtitle {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    /* ─── Tab switcher ─── */
+    .tabs {
+      display: flex;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 2rem;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 0.65rem;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 9px;
+      transition: all 0.3s;
+    }
+    .tab-btn.active {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 4px 14px var(--glow);
+    }
+
+    /* ─── Form ─── */
+    .form { display: none; }
+    .form.active { display: block; }
+
+    .field {
+      margin-bottom: 1.2rem;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-wrap i {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 0.95rem;
+      pointer-events: none;
+      transition: color 0.3s;
+    }
+
+    .input-wrap input {
+      width: 100%;
+      padding: 0.9rem 1rem 0.9rem 2.8rem;
+      background: var(--input-bg);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      transition: all 0.3s;
+      outline: none;
+    }
+
+    .input-wrap input::placeholder { color: rgba(148,163,184,0.5); }
+
+    .input-wrap input:focus {
+      border-color: var(--accent);
+      background: rgba(233,69,96,0.06);
+      box-shadow: 0 0 0 3px var(--glow);
+    }
+
+    .input-wrap input:focus + i,
+    .input-wrap:focus-within i { color: var(--accent); }
+
+    .input-wrap i { pointer-events: none; z-index: 1; }
+
+    /* toggle password */
+    .toggle-pw {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 0;
+      transition: color 0.3s;
+    }
+    .toggle-pw:hover { color: var(--accent); }
+
+    .submit-btn {
+      width: 100%;
+      padding: 1rem;
+      background: var(--accent);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      box-shadow: 0 4px 18px var(--glow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .submit-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.5s;
+    }
+
+    .submit-btn:hover::before { transform: translateX(100%); }
+    .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px var(--glow); }
+    .submit-btn:active { transform: translateY(0); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    /* ─── Alert messages ─── */
+    .alert {
+      padding: 0.85rem 1rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      margin-bottom: 1.2rem;
+      display: none;
+      align-items: center;
+      gap: 0.6rem;
+      animation: slideIn 0.3s ease;
+    }
+    .alert.show { display: flex; }
+    .alert.success { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); color: #34d399; }
+    .alert.error   { background: rgba(239,68,68,0.12);  border: 1px solid rgba(239,68,68,0.3);  color: #f87171; }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── Spinner ─── */
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── Footer link ─── */
+    .form-footer {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .form-footer a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .form-footer a:hover { text-decoration: underline; }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 750px) {
+      .page { flex-direction: column; }
+      .left-panel { padding: 2rem; }
+      .tagline { font-size: 1.8rem; }
+      .right-panel { width: 100%; padding: 2rem 1.8rem; }
+      .stats-row { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background orbs -->
+  <div class="bg-orb"></div>
+  <div class="bg-orb"></div>
+  <div class="bg-orb"></div>
+
+  <div class="page">
+
+    <!-- ─── Left branding panel ─── -->
+    <div class="left-panel">
+      <div class="brand">
+        <div class="brand-icon">EP</div>
+        <div class="brand-text">EyeCare<span>Pro</span></div>
+      </div>
+
+      <div>
+        <div class="tagline">
+          Your Vision.
+          <span class="highlight">Protected.</span>
+        </div>
+        <p class="tagline-sub">Real-time AI eye health monitoring with MediaPipe face tracking, blink analysis, and personalized insights.</p>
+      </div>
+
+      <div class="feature-pills">
+        <div class="pill"><i class="fas fa-brain"></i> AI-powered blink & fatigue detection</div>
+        <div class="pill"><i class="fas fa-ruler"></i> Real-time screen distance alerts</div>
+        <div class="pill"><i class="fas fa-chart-line"></i> Weekly health trends & reports</div>
+        <div class="pill"><i class="fas fa-trophy"></i> Badges & streak tracking</div>
+      </div>
+
+      <div class="stats-row">
+        <div class="mini-stat">
+          <div class="num">4</div>
+          <div class="lbl">Core Features</div>
+        </div>
+        <div class="mini-stat">
+          <div class="num">3</div>
+          <div class="lbl">AI Modules</div>
+        </div>
+        <div class="mini-stat">
+          <div class="num">1</div>
+          <div class="lbl">Unified App</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Right form panel ─── -->
+    <div class="right-panel">
+      <div class="form-header">
+        <div class="form-title" id="formTitle">Welcome back</div>
+        <div class="form-subtitle" id="formSubtitle">Sign in to your EyeCare Pro account</div>
+      </div>
+
+      <!-- Tab switcher -->
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('login')">Sign In</button>
+        <button class="tab-btn"        onclick="switchTab('register')">Create Account</button>
+      </div>
+
+      <!-- Alert -->
+      <div class="alert" id="alertBox">
+        <i class="fas fa-info-circle" id="alertIcon"></i>
+        <span id="alertMsg"></span>
+      </div>
+
+      <!-- ─── LOGIN FORM ─── -->
+      <div class="form active" id="loginForm">
+        <div class="field">
+          <label>Email address</label>
+          <div class="input-wrap">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email">
+          </div>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <div class="input-wrap">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password">
+            <button class="toggle-pw" type="button" onclick="togglePw('loginPassword', this)">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <button class="submit-btn" onclick="handleLogin()">
+          <div class="spinner" id="loginSpinner"></div>
+          <i class="fas fa-sign-in-alt" id="loginIcon"></i>
+          <span id="loginBtnText">Sign In</span>
+        </button>
+        <div class="form-footer">
+          Don't have an account? <a onclick="switchTab('register')">Create one</a>
+        </div>
+      </div>
+
+      <!-- ─── REGISTER FORM ─── -->
+      <div class="form" id="registerForm">
+        <div class="field">
+          <label>Full name</label>
+          <div class="input-wrap">
+            <i class="fas fa-user"></i>
+            <input type="text" id="regName" placeholder="Your name" autocomplete="name">
+          </div>
+        </div>
+        <div class="field">
+          <label>Email address</label>
+          <div class="input-wrap">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="regEmail" placeholder="you@example.com" autocomplete="email">
+          </div>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <div class="input-wrap">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="regPassword" placeholder="Min 6 characters" autocomplete="new-password">
+            <button class="toggle-pw" type="button" onclick="togglePw('regPassword', this)">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <button class="submit-btn" onclick="handleRegister()">
+          <div class="spinner" id="regSpinner"></div>
+          <i class="fas fa-user-plus" id="regIcon"></i>
+          <span id="regBtnText">Create Account</span>
+        </button>
+        <div class="form-footer">
+          Already have an account? <a onclick="switchTab('login')">Sign in</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const API = 'http://localhost:3001/api';
+
+    // ─── Tab switching ───
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach((b, i) => {
+        b.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'register' && i === 1));
+      });
+      document.getElementById('loginForm').classList.toggle('active',    tab === 'login');
+      document.getElementById('registerForm').classList.toggle('active', tab === 'register');
+      document.getElementById('formTitle').textContent    = tab === 'login' ? 'Welcome back'         : 'Join EyeCare Pro';
+      document.getElementById('formSubtitle').textContent = tab === 'login' ? 'Sign in to your account' : 'Create your free account';
+      hideAlert();
+    }
+
+    // ─── Alert helpers ───
+    function showAlert(msg, type = 'error') {
+      const box  = document.getElementById('alertBox');
+      const icon = document.getElementById('alertIcon');
+      document.getElementById('alertMsg').textContent = msg;
+      box.className  = `alert show ${type}`;
+      icon.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+    }
+    function hideAlert() {
+      document.getElementById('alertBox').classList.remove('show');
+    }
+
+    // ─── Loading state helpers ───
+    function setLoading(prefix, loading) {
+      document.getElementById(prefix + 'Spinner').style.display = loading ? 'block' : 'none';
+      document.getElementById(prefix + 'Icon').style.display    = loading ? 'none'  : 'inline-block';
+      document.querySelector(`[onclick="handle${prefix === 'login' ? 'Login' : 'Register'}()"]`).disabled = loading;
+    }
+
+    // ─── Toggle password visibility ───
+    function togglePw(inputId, btn) {
+      const input = document.getElementById(inputId);
+      const isHidden = input.type === 'password';
+      input.type = isHidden ? 'text' : 'password';
+      btn.querySelector('i').className = isHidden ? 'fas fa-eye-slash' : 'fas fa-eye';
+    }
+
+    // ─── Login ───
+    async function handleLogin() {
+      const email    = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      if (!email || !password) { showAlert('Please fill in all fields.'); return; }
+      hideAlert();
+      setLoading('login', true);
+
+      try {
+        const res  = await fetch(`${API}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          localStorage.setItem('eyecare_token', data.token);
+          localStorage.setItem('eyecare_user',  JSON.stringify(data.user));
+          showAlert('Login successful! Redirecting...', 'success');
+          setTimeout(() => window.location.href = 'index.html', 1000);
+        } else {
+          showAlert(data.message || 'Login failed.');
+        }
+      } catch (err) {
+        if (err instanceof TypeError && err.message.includes('fetch')) {
+          showAlert('❌ Cannot reach server at localhost:3001. Run: cd backend && npm start');
+        } else {
+          showAlert('Error: ' + err.message);
+        }
+      } finally {
+        setLoading('login', false);
+      }
+    }
+
+    // ─── Register ───
+    async function handleRegister() {
+      const name     = document.getElementById('regName').value.trim();
+      const email    = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value;
+
+      if (!name || !email || !password) { showAlert('Please fill in all fields.'); return; }
+      if (password.length < 6)          { showAlert('Password must be at least 6 characters.'); return; }
+      hideAlert();
+      setLoading('reg', true);
+
+      try {
+        const res  = await fetch(`${API}/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          localStorage.setItem('eyecare_token', data.token);
+          localStorage.setItem('eyecare_user',  JSON.stringify(data.user));
+          showAlert('Account created! Redirecting...', 'success');
+          setTimeout(() => window.location.href = 'index.html', 1000);
+        } else {
+          showAlert(data.message || 'Registration failed.');
+        }
+      } catch (err) {
+        if (err instanceof TypeError && err.message.includes('fetch')) {
+          showAlert('❌ Cannot reach server at localhost:3001. Run: cd backend && npm start');
+        } else {
+          showAlert('Error: ' + err.message);
+        }
+      } finally {
+        setLoading('reg', false);
+      }
+    }
+
+    // ─── Enter key support ───
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Enter') return;
+      if (document.getElementById('loginForm').classList.contains('active'))    handleLogin();
+      if (document.getElementById('registerForm').classList.contains('active')) handleRegister();
+    });
+
+    // ─── Check backend on load ───
+    async function checkBackend() {
+      try {
+        const res = await fetch(`${API}/health`, { signal: AbortSignal.timeout(3000) });
+        const data = await res.json();
+        if (data.status === 'OK') {
+          console.log('✅ Backend connected');
+        }
+      } catch (err) {
+        showAlert('⚠️ Backend not running. Start it with: cd backend && npm start', 'error');
+      }
+    }
+    checkBackend();
+
+    // ─── Redirect if already logged in ───
+    if (localStorage.getItem('eyecare_token')) {
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>

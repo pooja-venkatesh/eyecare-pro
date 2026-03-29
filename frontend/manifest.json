@@ -1,0 +1,16 @@
+{
+  "name": "EyeCare Pro",
+  "short_name": "EyeCare",
+  "description": "AI-powered real-time eye health monitoring with MediaPipe face tracking, fatigue prediction, and drowsiness detection.",
+  "start_url": "/login.html",
+  "display": "standalone",
+  "background_color": "#f0ebe3",
+  "theme_color": "#6b9b8e",
+  "orientation": "any",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "screenshots": [],
+  "categories": ["health", "lifestyle", "productivity"]
+}
